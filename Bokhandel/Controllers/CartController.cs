@@ -1,23 +1,33 @@
+using Bokhandel.Data;
 using Bokhandel.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bokhandel.Controllers
 {
-    public class CartController : Controller
+    public class CartController(BokhandelContext context, Cart cart) : Controller
     {
-        private readonly Cart _cart;
-
-        public CartController(Cart cart)
-        {
-            _cart = cart;
-        }
-
         // GET: CartController
         public ActionResult Index()
         {
-            var items = _cart.GetAllCartItems();
-            _cart.CartItems = items;
-            return View(_cart);
+            var items = cart.GetAllCartItems();
+            cart.CartItems = items;
+            return View(cart);
+        }
+
+        public ActionResult AddToCart(int id)
+        {
+            var selectedBook = GetBookById(id);
+            if (selectedBook != null)
+            {
+                cart.AddToCart(selectedBook, 1);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        public Book GetBookById(int id)
+        {
+            return context.Books.FirstOrDefault(b => b.Id == id);
         }
 
     }
