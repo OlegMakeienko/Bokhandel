@@ -6,15 +6,30 @@ using Bokhandel.Models;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BokhandelContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("BokhandelContext"), new MySqlServerVersion(new Version(8, 0, 21))
-                     ?? throw new InvalidOperationException("Connection string 'BokhandelContext' not found.")));
+        ?? throw new InvalidOperationException("Connection string 'BokhandelContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add HttpContextAccessor service
+builder.Services.AddHttpContextAccessor();
+
+// Add Cart service
+builder.Services.AddScoped<Cart>(sp => Cart.GetCart(sp));
+
+builder.Services.AddSession(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    //options.IdleTimeout = TimeSpan.FromSeconds(10);
+});
 
 var app = builder.Build();
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
+
+
 
 // try
 // {
@@ -39,11 +54,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Store}/{action=Index}/{id?}");
 
 app.Run();
