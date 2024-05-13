@@ -25,6 +25,45 @@ namespace Bokhandel.Controllers
             return RedirectToAction("Index");
         }
 
+        public ActionResult RemoveFromCart(int id)
+        {
+            var selectedBook = GetBookById(id);
+            if (selectedBook != null)
+            {
+                cart.RemoveFronCart(selectedBook);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult ReduceQuantity(int id)
+        {
+            var selectedBook = GetBookById(id);
+            if (selectedBook != null)
+            {
+                cart.ReduceQuantity(selectedBook);
+            }
+
+            return RedirectToAction("Index");
+        }
+        
+        public ActionResult IncreaseQuantity(int id)
+        {
+            var selectedBook = GetBookById(id);
+            if (selectedBook != null)
+            {
+                cart.IncreaseQuantity(selectedBook);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult ClearCart()
+        {
+            cart.ClearCart();
+            return RedirectToAction("Index");
+        }
+        
         public Book GetBookById(int id)
         {
             return context.Books.FirstOrDefault(b => b.Id == id);

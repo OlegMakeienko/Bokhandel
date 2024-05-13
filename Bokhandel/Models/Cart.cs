@@ -56,6 +56,60 @@ public class Cart
         _context.SaveChanges();
     }
 
+    public int ReduceQuantity(Book book)
+    {
+        var cartItem = GetCartItem(book);
+        var remainingQuantity = 0;
+        if (cartItem != null)
+        {
+            if (cartItem.Quantity > 1)
+            {
+                remainingQuantity = --cartItem.Quantity;
+            }
+            else
+            {
+                _context.CartItems.Remove(cartItem);
+            }
+        }
+
+        _context.SaveChanges();
+        return remainingQuantity;
+    }
+    
+    public int IncreaseQuantity(Book book)
+    {
+        var cartItem = GetCartItem(book);
+        var remainingQuantity = 0;
+        if (cartItem != null)
+        {
+            if (cartItem.Quantity > 0)
+            {
+                remainingQuantity = ++cartItem.Quantity;
+            }
+        }
+        _context.SaveChanges();
+        return remainingQuantity;
+    }
+
+    public void RemoveFronCart(Book book)
+    {
+        var cartItem = GetCartItem(book);
+
+        if (cartItem != null)
+        {
+            _context.CartItems.Remove(cartItem);
+        }
+
+        _context.SaveChanges();
+    }
+
+    public void ClearCart()
+    {
+        var cartItems = _context.CartItems.Where(ci => ci.CartId == Id);
+        _context.CartItems.RemoveRange(cartItems);
+        _context.SaveChanges();
+    }
+
     public List<CartItem> GetAllCartItems()
     {
         return CartItems ??
