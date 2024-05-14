@@ -7,6 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.4" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.4" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.4" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.4" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4">
@@ -19,6 +21,7 @@
 
     <ItemGroup>
       <Content Include="wwwroot\lib\fontawesome\svgs\.DS_Store" />
+      <Content Remove="obj\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -27,6 +30,18 @@
 
     <ItemGroup>
       <_ContentIncludedByDefault Remove="Pages\Order\Checkout.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="obj\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="obj\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="obj\**" />
     </ItemGroup>
 
 </Project>

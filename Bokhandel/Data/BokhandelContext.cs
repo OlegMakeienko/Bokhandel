@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Bokhandel.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Bokhandel.Data
 {
-    public class BokhandelContext : DbContext
+    public class BokhandelContext : IdentityDbContext<DefaultUser>
     {
         public BokhandelContext (DbContextOptions<BokhandelContext> options)
             : base(options)

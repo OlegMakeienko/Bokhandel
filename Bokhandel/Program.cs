@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Bokhandel.Data;
 using Bokhandel.Models;
 
@@ -7,6 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BokhandelContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("BokhandelContext"), new MySqlServerVersion(new Version(8, 0, 21))
         ?? throw new InvalidOperationException("Connection string 'BokhandelContext' not found.")));
+
+//add identity
+builder.Services.AddDefaultIdentity<DefaultUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<BokhandelContext>();
+builder.Services.AddRazorPages();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -27,7 +30,7 @@ builder.Services.AddSession(options =>
 var app = builder.Build();
 
 using var scope = app.Services.CreateScope();
-var services = scope.ServiceProvider;
+//var services = scope.ServiceProvider;
 
 
 
@@ -56,10 +59,13 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Store}/{action=Index}/{id?}");
+
+app.MapRazorPages();
 
 app.Run();

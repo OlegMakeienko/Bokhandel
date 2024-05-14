@@ -15,7 +15,7 @@
         <tbody>
         @foreach (var item in Model.OrderItems)
         {
-            var itemTotla = item.Book.Price * item.Quantity;
+            var itemsTotal = item.Book.Price * item.Quantity;
             <tr>
                 <td>
                     <a class="a-cleanup" asp-controller="Store" asp-action="Details" asp-route-id="@item.Id">
