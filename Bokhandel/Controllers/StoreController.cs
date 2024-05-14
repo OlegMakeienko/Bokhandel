@@ -1,9 +1,11 @@
 using Bokhandel.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bokhandel.Controllers;
 
+[Authorize]
 public class StoreController : Controller
 {
     private readonly BokhandelContext _context;
@@ -13,6 +15,7 @@ public class StoreController : Controller
         _context = context;
     }
     
+    [AllowAnonymous]
     public async Task<IActionResult> Index()
     {
         return View(await _context.Books.ToListAsync());
