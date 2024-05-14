@@ -78,14 +78,37 @@ namespace Bokhandel.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "First Name")]
+            public string FirstName { get; set; }
+
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Last name")]
+            public string LastName { get; set; }
+
             [Required]
             [EmailAddress]
+            [Display(Name = "Email")]
             public string Email { get; set; }
+
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Address")]
+            public string Address { get; set; }
+
+            [Required]
+            [DataType(DataType.PostalCode)]
+            [Display(Name = "Zip Code")]
+            public string ZipCode { get; set; }
+
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "City")]
+            public string City { get; set; }
         }
+
         
         public IActionResult OnGet() => RedirectToPage("./Login");
 

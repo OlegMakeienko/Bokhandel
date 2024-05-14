@@ -20,11 +20,13 @@ namespace Bokhandel.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
     {
+        private readonly UserManager<DefaultUser> _userManager;
         private readonly SignInManager<DefaultUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<DefaultUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(UserManager<DefaultUser> userManager, SignInManager<DefaultUser> signInManager, ILogger<LoginModel> logger)
         {
+            _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
         }

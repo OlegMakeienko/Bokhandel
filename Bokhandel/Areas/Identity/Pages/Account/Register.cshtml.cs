@@ -1,51 +1,26 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
-
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Bokhandel.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
 
 namespace Bokhandel.Areas.Identity.Pages.Account
 {
-    public class RegisterModel : PageModel
+    public class RegisterModel(
+        UserManager<DefaultUser> userManager,
+        SignInManager<DefaultUser> signInManager,
+        ILogger<RegisterModel> logger,
+        IEmailSender emailSender)
+        : PageModel
     {
-        private readonly SignInManager<DefaultUser> _signInManager;
-        private readonly UserManager<DefaultUser> _userManager;
-        private readonly IUserStore<DefaultUser> _userStore;
-        private readonly IUserEmailStore<DefaultUser> _emailStore;
-        private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
-
-        public RegisterModel(
-            UserManager<DefaultUser> userManager,
-            IUserStore<DefaultUser> userStore,
-            SignInManager<DefaultUser> signInManager,
-            ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
-        {
-            _userManager = userManager;
-            _userStore = userStore;
-            _emailStore = GetEmailStore();
-            _signInManager = signInManager;
-            _logger = logger;
-            _emailSender = emailSender;
-        }
-
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
@@ -130,27 +105,33 @@ namespace Bokhandel.Areas.Identity.Pages.Account
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
-
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
+                var user = new DefaultUser { 
+                    UserName = Input.Email, 
+                    FirstName = Input.FirstName,
+                    LastName = Input.LastName,
+                    Email = Input.Email,
+                    Address = Input.Address,
+                    ZipCode = Input.ZipCode,
+                    City = Input.City
+                };
+                
+                var result = await userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    logger.LogInformation("User created a new account with password.");
 
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var userId = await userManager.GetUserIdAsync(user);
+                    var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
@@ -158,16 +139,16 @@ namespace Bokhandel.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                    await emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    if (userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                     }
                     else
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        await signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
                     }
                 }
@@ -179,29 +160,6 @@ namespace Bokhandel.Areas.Identity.Pages.Account
 
             // If we got this far, something failed, redisplay form
             return Page();
-        }
-
-        private DefaultUser CreateUser()
-        {
-            try
-            {
-                return Activator.CreateInstance<DefaultUser>();
-            }
-            catch
-            {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(DefaultUser)}'. " +
-                    $"Ensure that '{nameof(DefaultUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-                    $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
-            }
-        }
-
-        private IUserEmailStore<DefaultUser> GetEmailStore()
-        {
-            if (!_userManager.SupportsUserEmail)
-            {
-                throw new NotSupportedException("The default UI requires a user store with email support.");
-            }
-            return (IUserEmailStore<DefaultUser>)_userStore;
         }
     }
 }
