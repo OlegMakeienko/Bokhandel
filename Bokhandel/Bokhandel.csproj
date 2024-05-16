@@ -30,6 +30,9 @@
 
     <ItemGroup>
       <_ContentIncludedByDefault Remove="Pages\Order\Checkout.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Admin\AddRole.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Admin\EditRole.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Admin\ListAllRoles.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
