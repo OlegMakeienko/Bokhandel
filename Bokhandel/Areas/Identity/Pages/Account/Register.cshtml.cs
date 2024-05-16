@@ -148,7 +148,7 @@ namespace Bokhandel.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        await signInManager.SignInAsync(user, isPersistent: false);
+                        await signInManager.SignInAsync(user, isPersistent: true);
                         return LocalRedirect(returnUrl);
                     }
                 }

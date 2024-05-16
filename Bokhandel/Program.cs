@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Bokhandel.Data;
 using Bokhandel.Models;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BokhandelContext>(options =>
@@ -8,7 +9,7 @@ builder.Services.AddDbContext<BokhandelContext>(options =>
         ?? throw new InvalidOperationException("Connection string 'BokhandelContext' not found.")));
 
 //add identity
-builder.Services.AddDefaultIdentity<DefaultUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<BokhandelContext>();
+builder.Services.AddDefaultIdentity<DefaultUser>(options => options.SignIn.RequireConfirmedAccount = false).AddRoles<IdentityRole>().AddEntityFrameworkStores<BokhandelContext>();
 builder.Services.AddRazorPages();
 
 // Add services to the container.
@@ -18,7 +19,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 
 // Add Cart service
-builder.Services.AddScoped<Cart>(sp => Cart.GetCart(sp));
+builder.Services.AddScoped<Cart>(Cart.GetCart);
 
 builder.Services.AddSession(options =>
 {
